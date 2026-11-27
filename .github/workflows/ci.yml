@@ -20,27 +20,24 @@ jobs:
 
     services:
       mongo:
-        image: mongo:latest
+        image: mongo:7.0
         ports:
           - 27017:27017
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - name: Cache Node.js modules
-        uses: actions/cache@v4
+        uses: actions/setup-node@v5
         with:
-          path: ~/.npm # npm cache files are stored in `~/.npm` on Linux/macOS
-          key: ${{ runner.OS }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.OS }}-node-${{ matrix.node-version }}-
-            ${{ runner.OS }}-node-
-            ${{ runner.OS }}-
+          node-verion: 20.x
+          cache: yarn
+          cache-dependency-path: server/yarn.lock
 
-      - run: yarn install
+      - run: yarn install --frozen-lockfile
       - run: yarn test
     env:
       CI: true
@@ -105,6 +102,9 @@ jobs:
     needs: test
     name: Build and push api-server image to docker hub
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
 
     steps:
       - name: Checkout
