@@ -1,9 +1,13 @@
-name: Test & Build
+name: CI
 
 on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
   test:
@@ -40,19 +44,12 @@ jobs:
       - run: yarn test
     env:
       CI: true
-      FACEBOOK_APP_ID: ${{ secrets.FACEBOOK_APP_ID }}
-      FACEBOOK_APP_SECRET: ${{ secrets.FACEBOOK_APP_SECRET }}
-      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_SECRET: ci-test-only-not-a-real-secret
       MONGO_URI: mongodb://localhost:27017/merndb
-      NGINX_PROXY_PORT: 8080
       NODE_ENV: development
-      PORT: 3000
       SERVER_HOST: http://localhost
       SERVER_PORT: 8861
       SERVER_PUBLIC_URL: http://localhost:3000
-      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
 
   build-and-push-client:
     needs: test
